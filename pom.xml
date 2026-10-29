@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>app</groupId>
-    <artifactId>delphi</artifactId>
+    <artifactId>farmview</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>

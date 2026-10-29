@@ -1,0 +1,233 @@
+@baseUrl = http://localhost:7070/api
+
+### Farm without name (400)
+POST {{baseUrl}}/farms
+Content-Type: application/json
+
+{}
+
+### Farm with blank name (400)
+POST {{baseUrl}}/farms
+Content-Type: application/json
+
+{"name": " "}
+
+### Farm with only latitude (400)
+POST {{baseUrl}}/farms
+Content-Type: application/json
+
+{"name": "Test", "latitude": 55.1}
+
+### Farm with latitude out of range (400)
+POST {{baseUrl}}/farms
+Content-Type: application/json
+
+{"name": "Test", "latitude": 200, "longitude": 10}
+
+### Farm with longitude out of range (400)
+POST {{baseUrl}}/farms
+Content-Type: application/json
+
+{"name": "Test", "latitude": 55, "longitude": 195}
+
+### Farm body is not JSON (400)
+POST {{baseUrl}}/farms
+Content-Type: application/json
+
+this is not json
+
+### Farm id is not a number (400)
+GET {{baseUrl}}/farms/abc
+Accept: application/json
+
+### Farm does not exist (404)
+GET {{baseUrl}}/farms/999
+Accept: application/json
+
+### Update farm that does not exist (404)
+PUT {{baseUrl}}/farms/999
+Content-Type: application/json
+
+{"name": "Nobody"}
+
+### Delete farm that does not exist (404)
+DELETE {{baseUrl}}/farms/999
+
+### Weather for farm without coordinates (409)
+GET {{baseUrl}}/farms/2/weather
+Accept: application/json
+
+### Weather for farm that does not exist (404)
+GET {{baseUrl}}/farms/999/weather
+Accept: application/json
+
+### Endpoint that does not exist (404)
+GET {{baseUrl}}/cows
+Accept: application/json
+
+### Section without name (400)
+POST {{baseUrl}}/farms/1/sections
+Content-Type: application/json
+
+{}
+
+### Section with unknown name (400)
+POST {{baseUrl}}/farms/1/sections
+Content-Type: application/json
+
+{"name": "BANANA"}
+
+### Section that farm 1 already has (409)
+POST {{baseUrl}}/farms/1/sections
+Content-Type: application/json
+
+{"name": "FARROWING"}
+
+### Section on farm that does not exist (404)
+POST {{baseUrl}}/farms/999/sections
+Content-Type: application/json
+
+{"name": "MATING"}
+
+### Sections on farm that does not exist (404)
+GET {{baseUrl}}/farms/999/sections
+Accept: application/json
+
+### Pens in a section that belongs to another farm (404)
+GET {{baseUrl}}/farms/2/sections/1/pens
+Accept: application/json
+
+### Empty pens in section that does not exist (404)
+GET {{baseUrl}}/farms/1/sections/999/pens/empty
+Accept: application/json
+
+### Sow without earmark (400)
+POST {{baseUrl}}/sows
+Content-Type: application/json
+
+{"type": "SOW", "penId": 3}
+
+### Sow with negative earmark (400)
+POST {{baseUrl}}/sows
+Content-Type: application/json
+
+{"earmark": -5, "type": "SOW", "penId": 3}
+
+### Sow without type (400)
+POST {{baseUrl}}/sows
+Content-Type: application/json
+
+{"earmark": 2001, "penId": 3}
+
+### Sow with unknown type (400)
+POST {{baseUrl}}/sows
+Content-Type: application/json
+
+{"earmark": 2001, "type": "PIGLET", "penId": 3}
+
+### Sow without pen (400)
+POST {{baseUrl}}/sows
+Content-Type: application/json
+
+{"earmark": 2001, "type": "SOW"}
+
+### Sow with negative litter (400)
+POST {{baseUrl}}/sows
+Content-Type: application/json
+
+{"earmark": 2001, "type": "SOW", "penId": 3, "litter": -1}
+
+### Sow in pen that does not exist (404)
+POST {{baseUrl}}/sows
+Content-Type: application/json
+
+{"earmark": 2001, "type": "SOW", "penId": 9999}
+
+### Sow with earmark that already exists (409)
+POST {{baseUrl}}/sows
+Content-Type: application/json
+
+{"earmark": 1001, "type": "SOW", "penId": 3}
+
+### A_SOW in mating (400)
+POST {{baseUrl}}/sows
+Content-Type: application/json
+
+{"earmark": 2001, "type": "A_SOW", "penId": 56}
+
+### Sow in full farrowing pen 1 (409)
+POST {{baseUrl}}/sows
+Content-Type: application/json
+
+{"earmark": 2001, "type": "SOW", "penId": 1}
+
+### Sow does not exist (404)
+GET {{baseUrl}}/sows/9999
+Accept: application/json
+
+### Earmark is not a number (400)
+GET {{baseUrl}}/sows/abc
+Accept: application/json
+
+### Filter with unknown type (400)
+GET {{baseUrl}}/sows?type=banana
+Accept: application/json
+
+### Filter with section that is not a number (400)
+GET {{baseUrl}}/sows?section=abc
+Accept: application/json
+
+### Filter with section that does not exist (404)
+GET {{baseUrl}}/sows?section=999
+Accept: application/json
+
+### Update with empty body (400)
+PUT {{baseUrl}}/sows/1003
+Content-Type: application/json
+
+{}
+
+### Update with negative days (400)
+PUT {{baseUrl}}/sows/1003
+Content-Type: application/json
+
+{"days": -3}
+
+### Update sow in mating to A_SOW (400)
+PUT {{baseUrl}}/sows/1001
+Content-Type: application/json
+
+{"type": "A_SOW"}
+
+### Update sow that does not exist (404)
+PUT {{baseUrl}}/sows/9999
+Content-Type: application/json
+
+{"litter": 1}
+
+### Move without pen (400)
+PUT {{baseUrl}}/sows/1001/move
+Content-Type: application/json
+
+{}
+
+### Move to full farrowing pen 1 (409)
+PUT {{baseUrl}}/sows/1001/move
+Content-Type: application/json
+
+{"penId": 1}
+
+### Move to pen that does not exist (404)
+PUT {{baseUrl}}/sows/1001/move
+Content-Type: application/json
+
+{"penId": 9999}
+
+### Move sow that does not exist (404)
+PUT {{baseUrl}}/sows/9999/move
+Content-Type: application/json
+
+{"penId": 3}
+
+### Delete sow that does not exist (404)
+DELETE {{baseUrl}}/sows/9999

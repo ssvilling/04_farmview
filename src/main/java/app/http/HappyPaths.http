@@ -1,0 +1,129 @@
+@baseUrl = http://localhost:7070/api
+
+### Health check
+GET {{baseUrl}}/health
+Accept: application/json
+
+### Create farm 1 with coordinates
+POST {{baseUrl}}/farms
+Content-Type: application/json
+
+{"name": "Gamlevælde", "latitude": 55.179, "longitude": 14.986}
+
+### Create farm 2 without coordinates
+POST {{baseUrl}}/farms
+Content-Type: application/json
+
+{"name": "Buggemøllen"}
+
+### Create farm 3
+POST {{baseUrl}}/farms
+Content-Type: application/json
+
+{"name": "Rosmanne"}
+
+### Get all farms
+GET {{baseUrl}}/farms
+Accept: application/json
+
+### Get farm 1
+GET {{baseUrl}}/farms/1
+Accept: application/json
+
+### Weather for farm 1 (24 hours)
+GET {{baseUrl}}/farms/1/weather
+Accept: application/json
+
+### Update farm 3
+PUT {{baseUrl}}/farms/3
+Content-Type: application/json
+
+{"name": "Rosmanne Nord", "latitude": 55.1, "longitude": 14.9}
+
+### Delete farm 3
+DELETE {{baseUrl}}/farms/3
+
+### Create section 1 on farm 1 (FARROWING, pens 1-55)
+POST {{baseUrl}}/farms/1/sections
+Content-Type: application/json
+
+{"name": "FARROWING"}
+
+### Create section 2 on farm 1 (MATING, pens 56-57)
+POST {{baseUrl}}/farms/1/sections
+Content-Type: application/json
+
+{"name": "MATING"}
+
+### Create section 3 on farm 2 (GESTATION, pens 58-64)
+POST {{baseUrl}}/farms/2/sections
+Content-Type: application/json
+
+{"name": "GESTATION"}
+
+### Get sections on farm 1
+GET {{baseUrl}}/farms/1/sections
+Accept: application/json
+
+### Get pens in section 2 on farm 1
+GET {{baseUrl}}/farms/1/sections/2/pens
+Accept: application/json
+
+### Create sow 1001 (A_SOW) in farrowing pen 1
+POST {{baseUrl}}/sows
+Content-Type: application/json
+
+{"earmark": 1001, "type": "A_SOW", "penId": 1, "virginId": 5, "litter": 2, "tits": 14}
+
+### Create sow 1002 (SOW) in farrowing pen 2
+POST {{baseUrl}}/sows
+Content-Type: application/json
+
+{"earmark": 1002, "type": "SOW", "penId": 2}
+
+### Create sow 1003 (GILT) in mating pen LEFT (56)
+POST {{baseUrl}}/sows
+Content-Type: application/json
+
+{"earmark": 1003, "type": "GILT", "penId": 56}
+
+### Get empty pens in section 1 on farm 1 (53 pens, 1 and 2 are taken)
+GET {{baseUrl}}/farms/1/sections/1/pens/empty
+Accept: application/json
+
+### Get all sows
+GET {{baseUrl}}/sows
+Accept: application/json
+
+### Get sows in section 1
+GET {{baseUrl}}/sows?section=1
+Accept: application/json
+
+### Get gilts
+GET {{baseUrl}}/sows?type=gilt
+Accept: application/json
+
+### Get sow 1001
+GET {{baseUrl}}/sows/1001
+Accept: application/json
+
+### Update sow 1003 (only litter and days)
+PUT {{baseUrl}}/sows/1003
+Content-Type: application/json
+
+{"litter": 1, "days": 30}
+
+### Move sow 1001 to mating pen RIGHT (57) - becomes SOW
+PUT {{baseUrl}}/sows/1001/move
+Content-Type: application/json
+
+{"penId": 57}
+
+### Move sow 1003 to farrowing pen 1 (empty now)
+PUT {{baseUrl}}/sows/1003/move
+Content-Type: application/json
+
+{"penId": 1}
+
+### Delete sow 1002
+DELETE {{baseUrl}}/sows/1002

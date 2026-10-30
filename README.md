@@ -2,10 +2,6 @@
 
 ## Vision
 
-Briefly describe the purpose of your project in 1–2 sentences.
-
-Example:
-
 > This project is a backend API for managing a farm, specifically with sows.  
 > The system allows users to track, move, find etc. animals of their choice or places, like pens and sections, even farms.
 
@@ -14,13 +10,12 @@ Example:
 ## Links
 
 Deployed application (optional):  
-<LINK>
+Not deployed yet
 
-Source code repository:  
-<LINK>
+Source code repository:
 
-Portfolio website:  
-<LINK>
+https://github.com/ssvilling/04_farmview
+
 
 ---
 
@@ -28,15 +23,16 @@ Portfolio website:
 
 ## System Overview
 
-Describe the overall structure of the system.
+The project is a layered backend built with Javalin and JPA/Hibernate. A request always travels the same way: Routes → Controller → DAO → Database, and the answer goes back the same way as JSON.
 
-Example:
-
-This project is built as a layered backend architecture using:
-
+- Routes (Maps URL to controller)
 - Controller layer (REST endpoints)
+- DAO layer (Database work, with exceptions)
+- Entities (JPA classes mapping to database)
+- Enums (holds rules for some entities)
+- DTO layer (Objects sent to and from the client)
 - Service layer (business logic)
-- Repository layer (database access)
+- Config layer (error handling, and creation of emf)
 
 Technologies used:
 
@@ -45,41 +41,30 @@ Technologies used:
 - JPA / Hibernate
 - PostgreSQL
 - Maven
-- Lombok and Jackson
+- Lombok
+- Jackson
+- SLF4J + Logback (console and file logging)
 - JUnit 6, Hamcrest, Testcontainers and Rest Assured for testing
 - Open-Meteo (external weather API)
 
 ---
 
 ## Architecture Diagram
-
-(Optional but recommended)
-
-You can include a simple diagram showing the main components.
-
-Example:
-
-Or include an image if you created a diagram.
+![ARC](docs/architecture.svg)
 
 ---
 
 ## Key Design Decisions
 
-Describe important technical decisions you made.
+I split the project into layers (routes, controllers, DAOs, entities, DTOs). Each layer has one job, so I can follow a request from the URL all the way down to the database
 
-Examples:
+All my errors are handled in one place, in ApplicationConfig. The DAOs throw an ApiException with a status code and a message, and the client gets the same format back, {"status" : 404, "msg" : "No farm with id 999"}. That way the client never sees a crash or a stack trace
 
-- Why you chose your project structure
-- How authentication works
-- How errors are handled
-- Why you chose specific libraries or frameworks
+I never send my entities as JSON, only DTOs. My entities point at each other (a farm has sections, a section has a farm), so Jackson would keep going in circles. The DTOs only have an id or a count instead, like farmId and numberOfPens
 
-Example:
+The section type decides its pens: FARROWING always gets 55 pens with room for one sow each. The rules for the sows (an A_SOW can only be in FARROWING, a full pen can't take another sow) are checked in the DAO before anything is saved
 
-**Authentication**
-
-Authentication is implemented using JWT tokens.  
-Users log in and receive a token which must be included in subsequent API requests.
+I used these libraries: Javalin, Hibernate, Lombok, Jackson, SLF4J/Logback, JUnit, Testcontainers and Rest Assured. For the weather I used Open-Meteo, because it's free and doesn't need an API key
 
 ---
 
@@ -90,48 +75,40 @@ Users log in and receive a token which must be included in subsequent API reques
 Insert your Entity Relationship Diagram here.
 ![ERD](docs/erd.svg)
 
-Example entities:
-
-- User
-- Activity
-- Workout
-- Exercise
-
-You may include:
-
-- an image
-- a link to a diagram
-- or a textual explanation
+A farm has at most one section of each type (unique constraint on farm_id + name). Pens are created with their section. Deleting a farm will delete its sections, pens and sows (cascade)
 
 ---
 
 ## Important Entities
 
-Briefly describe the main entities in your system.
-
-### User
-
-Represents a registered user in the system.
-
+**Farm**
+A farm can be made with an optional location based on latitude and longitude. If there's no location, then no weather forecast will be shown
 Fields:
-
 - id
-- username
-- password
-- role
+- name
+- latitude, longitude (both or neither)
 
-### Activity
-
-Represents a recorded workout activity.
-
+**Section**
+A section is a part of the farm, each with a different functionality (though thats not fully convinced through this project, yet). It can either be MATING, GESTATION, or FARROWING
 Fields:
-
 - id
-- userId
-- date
-- description
+- name (SectionName enum)
+- farm
 
----
+**Pen**
+A pen inside a section is created automatically. Each section has rules for their pens, if multiple or only one sow can be in it
+Fields:
+- id
+- label ("LEFT"/"RIGHT", "1"-"7", "1"-"55")
+- section
+
+**Sow**
+A sow is identified by her earmark. She has a type, in which two of the four are restricted to FARROWING.
+Fields:
+- earmark (id)
+- type (GILT, SOW, A_SOW, CARE_SOW)
+- virginId, litter, tits, days
+- pen
 
 # API Documentation
 
